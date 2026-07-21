@@ -1,0 +1,131 @@
+import 'package:drift/native.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:calendario_movil/data/db/database.dart';
+import 'package:calendario_movil/data/repositories/event_repository.dart';
+import 'package:calendario_movil/domain/entities/event.dart';
+
+void main() {
+  late AppDatabase db;
+  late EventRepository repo;
+
+  setUp(() {
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+    repo = EventRepository(db);
+  });
+
+  tearDown(() async {
+    await db.close();
+  });
+
+  Event buildEvent({
+    String title = 'Evento de prueba',
+    DateTime? start,
+    DateTime? end,
+  }) {
+    final s = start ?? DateTime(2026, 7, 21, 10);
+    return Event(
+      title: title,
+      startAt: s,
+      endAt: end ?? s.add(const Duration(hours: 1)),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  group('EventRepository', () {
+    test('create asigna id y getById lo recupera', () async {
+      final created = await repo.create(buildEvent(title: 'Clase de cálculo'));
+
+      expect(created.id, isNotNull);
+
+      final found = await repo.getById(created.id!);
+      expect(found, isNotNull);
+      expect(found!.title, 'Clase de cálculo');
+      expect(found.startAt, DateTime(2026, 7, 21, 10));
+    });
+
+    test('getById devuelve null si no existe', () async {
+      expect(await repo.getById(999), isNull);
+    });
+
+    test('update modifica los campos', () async {
+      final created = await repo.create(buildEvent());
+
+      await repo.update(created.copyWith(
+        title: 'Título nuevo',
+        colorIndex: 3,
+      ));
+
+      final found = await repo.getById(created.id!);
+      expect(found!.title, 'Título nuevo');
+      expect(found.colorIndex, 3);
+    });
+
+    test('update sin id lanza ArgumentError', () async {
+      expect(() => repo.update(buildEvent()), throwsArgumentError);
+    });
+
+    test('delete elimina el evento', () async {
+      final created = await repo.create(buildEvent());
+
+      await repo.delete(created.id!);
+
+      expect(await repo.getById(created.id!), isNull);
+    });
+
+    test('watchEventsBetween filtra por rango y ordena por inicio', () async {
+      await repo.create(buildEvent(
+        title: 'Dentro B',
+        start: DateTime(2026, 7, 15, 14),
+      ));
+      await repo.create(buildEvent(
+        title: 'Dentro A',
+        start: DateTime(2026, 7, 15, 9),
+      ));
+      await repo.create(buildEvent(
+        title: 'Fuera (junio)',
+        start: DateTime(2026, 6, 1, 9),
+      ));
+
+      final events = await repo
+          .watchEventsBetween(DateTime(2026, 7, 1), DateTime(2026, 8, 1))
+          .first;
+
+      expect(events.length, 2);
+      expect(events[0].title, 'Dentro A');
+      expect(events[1].title, 'Dentro B');
+    });
+
+    test('watchEventsBetween incluye eventos que cruzan el borde del rango',
+        () async {
+      await repo.create(buildEvent(
+        title: 'Cruza medianoche',
+        start: DateTime(2026, 6, 30, 23),
+        end: DateTime(2026, 7, 1, 1),
+      ));
+
+      final events = await repo
+          .watchEventsBetween(DateTime(2026, 7, 1), DateTime(2026, 8, 1))
+          .first;
+
+      expect(events.length, 1);
+      expect(events[0].title, 'Cruza medianoche');
+    });
+
+    test('el stream emite de nuevo al insertar', () async {
+      final stream = repo.watchEventsBetween(
+        DateTime(2026, 7, 1),
+        DateTime(2026, 8, 1),
+      );
+
+      final futureEmissions = stream.take(2).toList();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await repo.create(buildEvent(start: DateTime(2026, 7, 10, 8)));
+
+      final emissions = await futureEmissions;
+      expect(emissions[0], isEmpty);
+      expect(emissions[1].length, 1);
+    });
+  });
+}
