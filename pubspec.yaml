@@ -41,6 +41,13 @@ dependencies:
   go_router: ^17.2.3
   # Tipografía redondeada para el estilo onírico
   google_fonts: ^6.2.1
+
+  # Calendario mensual (Fase 3)
+  table_calendar: ^3.2.0
+  # Localización en español
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   drift: ^2.34.2
   drift_flutter: ^0.3.1
 
