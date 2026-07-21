@@ -1,36 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_gradients.dart';
+import 'settings_providers.dart';
 
-/// Pantalla de ajustes (contenido real en Fases 7 y 9).
-class SettingsScreen extends StatelessWidget {
+/// Ajustes de la app. Más secciones llegan en Fases 7 y 9
+/// (API key, mascota, hora del mensaje, backup…).
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(title: const Text('Ajustes')),
       body: DreamyBackground(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
             children: [
-              Icon(
-                Icons.settings,
-                size: 72,
-                color: Theme.of(context).colorScheme.tertiary,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Ajustes de la app',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Fases 7 y 9',
-                style: Theme.of(context).textTheme.labelSmall,
+              Text('Apariencia', style: textTheme.titleMedium),
+              const SizedBox(height: 12),
+              Card(
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Tema', style: textTheme.bodyMedium),
+                      const SizedBox(height: 12),
+                      SegmentedButton<ThemeMode>(
+                        segments: const [
+                          ButtonSegment(
+                            value: ThemeMode.system,
+                            label: Text('Sistema'),
+                            icon: Icon(Icons.brightness_auto_outlined),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.light,
+                            label: Text('Claro'),
+                            icon: Icon(Icons.light_mode_outlined),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.dark,
+                            label: Text('Oscuro'),
+                            icon: Icon(Icons.dark_mode_outlined),
+                          ),
+                        ],
+                        selected: {themeMode},
+                        onSelectionChanged: (selection) => ref
+                            .read(themeModeProvider.notifier)
+                            .setMode(selection.first),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
+import '../app_providers.dart';
 import '../calendar/calendar_providers.dart';
 import 'event_providers.dart';
 
@@ -181,6 +182,8 @@ class _EventDetailView extends ConsumerWidget {
     );
     if (confirmed != true) return;
 
+    // Cancela la alarma antes de borrar el evento.
+    await ref.read(reminderSchedulerProvider).cancelForEvent(event.id!);
     await ref.read(eventRepositoryProvider).delete(event.id!);
     if (context.mounted) context.pop();
   }

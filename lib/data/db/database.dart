@@ -6,9 +6,8 @@ import 'tables.dart';
 part 'database.g.dart';
 
 /// Base de datos de la app.
-/// Las tablas `reminders` y `pet_messages` se añadirán en las
-/// Fases 5 y 6 con sus migraciones.
-@DriftDatabase(tables: [Events, Settings])
+/// La tabla `pet_messages` se añadirá en la Fase 6 con su migración.
+@DriftDatabase(tables: [Events, Settings, Reminders])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -16,7 +15,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            // v1 → v2 (Fase 5): tabla de recordatorios.
+            await m.createTable(reminders);
+          }
+        },
+      );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'calendario_movil');

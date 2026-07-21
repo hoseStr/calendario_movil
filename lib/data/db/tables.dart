@@ -18,6 +18,18 @@ class Events extends Table {
   DateTimeColumn get updatedAt => dateTime()();
 }
 
+/// Recordatorios programados (bitácora de notificaciones).
+/// Estados: 'scheduled' | 'fired' | 'cancelled'.
+@DataClassName('ReminderRow')
+class Reminders extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get eventId =>
+      integer().references(Events, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get fireAt => dateTime()();
+  IntColumn get notificationId => integer()();
+  TextColumn get status => text().withDefault(const Constant('scheduled'))();
+}
+
 /// Preferencias clave-valor (nombre de la mascota, hora del mensaje, etc.).
 @DataClassName('SettingRow')
 class Settings extends Table {

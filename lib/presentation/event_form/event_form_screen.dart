@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
+import '../app_providers.dart';
 import '../calendar/calendar_providers.dart';
 
 const _reminderOptions = <int?, String>{
@@ -148,11 +149,15 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     );
 
     final repo = ref.read(eventRepositoryProvider);
+    final Event saved;
     if (_isEditing) {
       await repo.update(event);
+      saved = event;
     } else {
-      await repo.create(event);
+      saved = await repo.create(event);
     }
+    // Programa (o reprograma) la alarma del evento.
+    await ref.read(reminderSchedulerProvider).syncEvent(saved);
     if (mounted) context.pop();
   }
 

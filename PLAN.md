@@ -92,6 +92,11 @@ Objetivo: la app te avisa aunque esté cerrada.
 
 **Terminado cuando:** una alarma suena con la app cerrada y tras reiniciar el teléfono.
 
+**Extras ya hechos en esta fase (no estaban en el plan original):**
+- [x] Alarma a pantalla completa sobre el bloqueo (full-screen intent, estilo Google Calendar) con vibración: `AlarmScreen` con Descartar / Aplazar 5 min.
+- [x] Mensajes graciosos de la mascota en la alarma (banco local temporal en `core/constants/alarm_pet_messages.dart`).
+- [x] Selector de tema claro/oscuro/sistema en Ajustes, persistido en la tabla `settings`.
+
 ---
 
 ## Fase 6 — Mascota con mensajes locales (1-2 sesiones)
@@ -104,6 +109,7 @@ Objetivo: la mascota existe y anima, sin depender aún de internet.
 - [ ] Banco local de ~30 mensajes por estado (`core/constants/fallback_messages.dart`).
 - [ ] `presentation/pet/`: pantalla de la mascota (imagen estática por ahora) + mensaje del día + historial; widget pequeño de la mascota en la pantalla del calendario.
 - [ ] Lógica "máx. 1 mensaje por día" cacheado en DB.
+- [ ] **Integrar la mascota en `AlarmScreen`** (la pantalla de alarma sobre el bloqueo creada en Fase 5): sus mensajes de apuro salen del banco de la mascota según su personalidad, reemplazando `alarm_pet_messages.dart`.
 
 **Terminado cuando:** la mascota muestra un mensaje coherente con tu agenda, sin internet.
 
@@ -131,6 +137,7 @@ Objetivo: darle vida.
 - [ ] Elegir `rive` (interactiva) o `lottie` (más fácil, animaciones listas en LottieFiles).
 - [ ] Animaciones por `PetMood`: feliz, animando, dormida, celebrando → en `assets/animations/`.
 - [ ] Conectar mood al resumen de agenda (día libre → dormida/relajada; día cargado → animando; evento completado → celebrando).
+- [ ] **Mascota animada en `AlarmScreen`**: en la pantalla de alarma sobre el bloqueo aparece la animación de "apurando" (mood urgente/gracioso), reemplazando el placeholder circular.
 - [ ] Notificación matutina diaria con el mensaje de la mascota (reusa `NotificationService`).
 
 **Terminado cuando:** la mascota cambia de animación según tu semana.

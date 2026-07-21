@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/alarm/alarm_screen.dart';
 import '../../presentation/calendar/calendar_screen.dart';
 import '../../presentation/event_form/event_detail_screen.dart';
 import '../../presentation/event_form/event_form_screen.dart';
@@ -13,6 +14,13 @@ import '../../presentation/settings/settings_screen.dart';
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   routes: [
+    // Alarma a pantalla completa (fuera del shell, sin barra inferior).
+    GoRoute(
+      path: '/alarm/:id',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) =>
+          AlarmScreen(eventId: state.pathParameters['id']!),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
           _AppShell(navigationShell: navigationShell),
