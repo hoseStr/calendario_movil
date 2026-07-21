@@ -68,6 +68,15 @@ class EventRepository {
     await (_db.delete(_db.events)..where((t) => t.id.equals(id))).go();
   }
 
+  /// Stream reactivo de un evento por id. Emite null si no existe
+  /// (por ejemplo, tras borrarlo).
+  Stream<Event?> watchById(int id) {
+    final query = _db.select(_db.events)..where((t) => t.id.equals(id));
+    return query
+        .watchSingleOrNull()
+        .map((row) => row == null ? null : _toEntity(row));
+  }
+
   Future<Event?> getById(int id) async {
     final row = await (_db.select(_db.events)
           ..where((t) => t.id.equals(id)))

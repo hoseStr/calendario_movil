@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
-import '../../data/db/seed.dart';
 import '../../data/repositories/event_repository.dart';
 import '../../domain/entities/event.dart';
 
@@ -14,7 +11,6 @@ DateTime dayKey(DateTime d) => DateTime(d.year, d.month, d.day);
 /// AppDatabase.forTesting(NativeDatabase.memory()).
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
-  unawaited(seedDemoEvents(db)); // TEMPORAL — quitar en Fase 4.
   ref.onDispose(db.close);
   return db;
 });

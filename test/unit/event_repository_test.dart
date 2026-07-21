@@ -113,6 +113,18 @@ void main() {
       expect(events[0].title, 'Cruza medianoche');
     });
 
+    test('watchById emite el evento y null tras borrarlo', () async {
+      final created = await repo.create(buildEvent(title: 'Observado'));
+
+      final first = await repo.watchById(created.id!).first;
+      expect(first?.title, 'Observado');
+
+      await repo.delete(created.id!);
+
+      final after = await repo.watchById(created.id!).first;
+      expect(after, isNull);
+    });
+
     test('el stream emite de nuevo al insertar', () async {
       final stream = repo.watchEventsBetween(
         DateTime(2026, 7, 1),
