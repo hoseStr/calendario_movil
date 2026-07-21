@@ -7,6 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
+import '../pet/pet_providers.dart';
 import 'calendar_providers.dart';
 
 /// Pantalla principal: mes + lista de eventos del día seleccionado.
@@ -105,8 +106,9 @@ class CalendarScreen extends ConsumerWidget {
                   },
                 ),
               ),
+              const _PetPeek(),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -149,6 +151,53 @@ class CalendarScreen extends ConsumerWidget {
     if (isSameDay(day, now.add(const Duration(days: 1)))) return 'Mañana';
     final formatted = DateFormat("EEEE d 'de' MMMM", 'es').format(day);
     return formatted[0].toUpperCase() + formatted.substring(1);
+  }
+}
+
+/// Vistazo de la mascota: su mensaje del día en una línea.
+/// Tap → pestaña de la mascota.
+class _PetPeek extends ConsumerWidget {
+  const _PetPeek();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dailyMessage = ref.watch(dailyPetMessageProvider).value;
+    if (dailyMessage == null) return const SizedBox.shrink();
+
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () => context.go('/pet'),
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor:
+                      scheme.primaryContainer.withValues(alpha: 0.7),
+                  child: Icon(Icons.pets, size: 18, color: scheme.primary),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    dailyMessage.message,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

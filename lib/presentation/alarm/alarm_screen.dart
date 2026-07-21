@@ -1,11 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/constants/alarm_pet_messages.dart';
+import '../../core/constants/fallback_messages.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
 import '../app_providers.dart';
@@ -46,8 +44,7 @@ class _AlarmContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
-    final petMessage =
-        alarmPetMessages[Random().nextInt(alarmPetMessages.length)];
+    final petMessage = FallbackMessages.randomHurry();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),

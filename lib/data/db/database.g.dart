@@ -1233,12 +1233,353 @@ class RemindersCompanion extends UpdateCompanion<ReminderRow> {
   }
 }
 
+class $PetMessagesTable extends PetMessages
+    with TableInfo<$PetMessagesTable, PetMessageRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PetMessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _moodMeta = const VerificationMeta('mood');
+  @override
+  late final GeneratedColumn<String> mood = GeneratedColumn<String>(
+    'mood',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _messageMeta = const VerificationMeta(
+    'message',
+  );
+  @override
+  late final GeneratedColumn<String> message = GeneratedColumn<String>(
+    'message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('fallback'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, date, mood, message, source];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pet_messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PetMessageRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('mood')) {
+      context.handle(
+        _moodMeta,
+        mood.isAcceptableOrUnknown(data['mood']!, _moodMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_moodMeta);
+    }
+    if (data.containsKey('message')) {
+      context.handle(
+        _messageMeta,
+        message.isAcceptableOrUnknown(data['message']!, _messageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_messageMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PetMessageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PetMessageRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      mood: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mood'],
+      )!,
+      message: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}message'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+    );
+  }
+
+  @override
+  $PetMessagesTable createAlias(String alias) {
+    return $PetMessagesTable(attachedDatabase, alias);
+  }
+}
+
+class PetMessageRow extends DataClass implements Insertable<PetMessageRow> {
+  final int id;
+
+  /// Día normalizado (sin hora).
+  final DateTime date;
+  final String mood;
+  final String message;
+  final String source;
+  const PetMessageRow({
+    required this.id,
+    required this.date,
+    required this.mood,
+    required this.message,
+    required this.source,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<DateTime>(date);
+    map['mood'] = Variable<String>(mood);
+    map['message'] = Variable<String>(message);
+    map['source'] = Variable<String>(source);
+    return map;
+  }
+
+  PetMessagesCompanion toCompanion(bool nullToAbsent) {
+    return PetMessagesCompanion(
+      id: Value(id),
+      date: Value(date),
+      mood: Value(mood),
+      message: Value(message),
+      source: Value(source),
+    );
+  }
+
+  factory PetMessageRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PetMessageRow(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      mood: serializer.fromJson<String>(json['mood']),
+      message: serializer.fromJson<String>(json['message']),
+      source: serializer.fromJson<String>(json['source']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<DateTime>(date),
+      'mood': serializer.toJson<String>(mood),
+      'message': serializer.toJson<String>(message),
+      'source': serializer.toJson<String>(source),
+    };
+  }
+
+  PetMessageRow copyWith({
+    int? id,
+    DateTime? date,
+    String? mood,
+    String? message,
+    String? source,
+  }) => PetMessageRow(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    mood: mood ?? this.mood,
+    message: message ?? this.message,
+    source: source ?? this.source,
+  );
+  PetMessageRow copyWithCompanion(PetMessagesCompanion data) {
+    return PetMessageRow(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      mood: data.mood.present ? data.mood.value : this.mood,
+      message: data.message.present ? data.message.value : this.message,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PetMessageRow(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('mood: $mood, ')
+          ..write('message: $message, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, date, mood, message, source);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PetMessageRow &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.mood == this.mood &&
+          other.message == this.message &&
+          other.source == this.source);
+}
+
+class PetMessagesCompanion extends UpdateCompanion<PetMessageRow> {
+  final Value<int> id;
+  final Value<DateTime> date;
+  final Value<String> mood;
+  final Value<String> message;
+  final Value<String> source;
+  const PetMessagesCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.mood = const Value.absent(),
+    this.message = const Value.absent(),
+    this.source = const Value.absent(),
+  });
+  PetMessagesCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime date,
+    required String mood,
+    required String message,
+    this.source = const Value.absent(),
+  }) : date = Value(date),
+       mood = Value(mood),
+       message = Value(message);
+  static Insertable<PetMessageRow> custom({
+    Expression<int>? id,
+    Expression<DateTime>? date,
+    Expression<String>? mood,
+    Expression<String>? message,
+    Expression<String>? source,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (mood != null) 'mood': mood,
+      if (message != null) 'message': message,
+      if (source != null) 'source': source,
+    });
+  }
+
+  PetMessagesCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? date,
+    Value<String>? mood,
+    Value<String>? message,
+    Value<String>? source,
+  }) {
+    return PetMessagesCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      mood: mood ?? this.mood,
+      message: message ?? this.message,
+      source: source ?? this.source,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (mood.present) {
+      map['mood'] = Variable<String>(mood.value);
+    }
+    if (message.present) {
+      map['message'] = Variable<String>(message.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PetMessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('mood: $mood, ')
+          ..write('message: $message, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $EventsTable events = $EventsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $RemindersTable reminders = $RemindersTable(this);
+  late final $PetMessagesTable petMessages = $PetMessagesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1247,6 +1588,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     events,
     settings,
     reminders,
+    petMessages,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2120,6 +2462,200 @@ typedef $$RemindersTableProcessedTableManager =
       ReminderRow,
       PrefetchHooks Function({bool eventId})
     >;
+typedef $$PetMessagesTableCreateCompanionBuilder =
+    PetMessagesCompanion Function({
+      Value<int> id,
+      required DateTime date,
+      required String mood,
+      required String message,
+      Value<String> source,
+    });
+typedef $$PetMessagesTableUpdateCompanionBuilder =
+    PetMessagesCompanion Function({
+      Value<int> id,
+      Value<DateTime> date,
+      Value<String> mood,
+      Value<String> message,
+      Value<String> source,
+    });
+
+class $$PetMessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $PetMessagesTable> {
+  $$PetMessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mood => $composableBuilder(
+    column: $table.mood,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get message => $composableBuilder(
+    column: $table.message,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PetMessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PetMessagesTable> {
+  $$PetMessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mood => $composableBuilder(
+    column: $table.mood,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get message => $composableBuilder(
+    column: $table.message,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PetMessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PetMessagesTable> {
+  $$PetMessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get mood =>
+      $composableBuilder(column: $table.mood, builder: (column) => column);
+
+  GeneratedColumn<String> get message =>
+      $composableBuilder(column: $table.message, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+}
+
+class $$PetMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PetMessagesTable,
+          PetMessageRow,
+          $$PetMessagesTableFilterComposer,
+          $$PetMessagesTableOrderingComposer,
+          $$PetMessagesTableAnnotationComposer,
+          $$PetMessagesTableCreateCompanionBuilder,
+          $$PetMessagesTableUpdateCompanionBuilder,
+          (
+            PetMessageRow,
+            BaseReferences<_$AppDatabase, $PetMessagesTable, PetMessageRow>,
+          ),
+          PetMessageRow,
+          PrefetchHooks Function()
+        > {
+  $$PetMessagesTableTableManager(_$AppDatabase db, $PetMessagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PetMessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PetMessagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PetMessagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<String> mood = const Value.absent(),
+                Value<String> message = const Value.absent(),
+                Value<String> source = const Value.absent(),
+              }) => PetMessagesCompanion(
+                id: id,
+                date: date,
+                mood: mood,
+                message: message,
+                source: source,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime date,
+                required String mood,
+                required String message,
+                Value<String> source = const Value.absent(),
+              }) => PetMessagesCompanion.insert(
+                id: id,
+                date: date,
+                mood: mood,
+                message: message,
+                source: source,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PetMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PetMessagesTable,
+      PetMessageRow,
+      $$PetMessagesTableFilterComposer,
+      $$PetMessagesTableOrderingComposer,
+      $$PetMessagesTableAnnotationComposer,
+      $$PetMessagesTableCreateCompanionBuilder,
+      $$PetMessagesTableUpdateCompanionBuilder,
+      (
+        PetMessageRow,
+        BaseReferences<_$AppDatabase, $PetMessagesTable, PetMessageRow>,
+      ),
+      PetMessageRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2130,4 +2666,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$RemindersTableTableManager get reminders =>
       $$RemindersTableTableManager(_db, _db.reminders);
+  $$PetMessagesTableTableManager get petMessages =>
+      $$PetMessagesTableTableManager(_db, _db.petMessages);
 }

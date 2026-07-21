@@ -30,6 +30,19 @@ class Reminders extends Table {
   TextColumn get status => text().withDefault(const Constant('scheduled'))();
 }
 
+/// Mensajes diarios de la mascota (máx. 1 por día).
+/// source: 'gemini' | 'fallback'.
+@DataClassName('PetMessageRow')
+class PetMessages extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Día normalizado (sin hora).
+  DateTimeColumn get date => dateTime()();
+  TextColumn get mood => text()();
+  TextColumn get message => text()();
+  TextColumn get source => text().withDefault(const Constant('fallback'))();
+}
+
 /// Preferencias clave-valor (nombre de la mascota, hora del mensaje, etc.).
 @DataClassName('SettingRow')
 class Settings extends Table {

@@ -6,8 +6,7 @@ import 'tables.dart';
 part 'database.g.dart';
 
 /// Base de datos de la app.
-/// La tabla `pet_messages` se añadirá en la Fase 6 con su migración.
-@DriftDatabase(tables: [Events, Settings, Reminders])
+@DriftDatabase(tables: [Events, Settings, Reminders, PetMessages])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -15,7 +14,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -24,6 +23,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             // v1 → v2 (Fase 5): tabla de recordatorios.
             await m.createTable(reminders);
+          }
+          if (from < 3) {
+            // v2 → v3 (Fase 6): mensajes de la mascota.
+            await m.createTable(petMessages);
           }
         },
       );

@@ -5,8 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:calendario_movil/data/db/database.dart';
+import 'package:calendario_movil/domain/entities/agenda_summary.dart';
+import 'package:calendario_movil/domain/entities/pet_message.dart';
 import 'package:calendario_movil/main.dart';
 import 'package:calendario_movil/presentation/calendar/calendar_providers.dart';
+import 'package:calendario_movil/presentation/pet/pet_providers.dart';
 
 void main() {
   setUpAll(() async {
@@ -20,7 +23,20 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          // Mensaje fijo: la cadena asíncrona real (resumen de agenda +
+          // guardado en BD) no se lleva bien con el reloj falso del test
+          // y ya está cubierta por los tests unitarios.
+          dailyPetMessageProvider.overrideWith(
+            (ref) async => PetMessage(
+              date: DateTime(2026, 7, 22),
+              mood: PetMood.happy,
+              message: 'Hola humano',
+              source: 'fallback',
+            ),
+          ),
+        ],
         child: const CalendarioApp(),
       ),
     );
