@@ -125,7 +125,7 @@ class _AlarmContent extends ConsumerWidget {
   }
 
   String _subtitle(DateTime startAt) {
-    final time = DateFormat.Hm().format(startAt);
+    final time = DateFormat('h:mm a').format(startAt);
     final diff = startAt.difference(DateTime.now()).inMinutes;
     if (diff > 1) return 'Hoy $time · comienza en $diff min';
     if (diff >= 0) return 'Hoy $time · ¡comienza ya!';

@@ -12,13 +12,36 @@ import '../pet/pet_providers.dart';
 import 'calendar_providers.dart';
 
 /// Pantalla principal: mes + lista de eventos del día seleccionado.
-class CalendarScreen extends ConsumerWidget {
+class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
+}
+
+class _CalendarScreenState extends ConsumerState<CalendarScreen> {
+  // Controlador de páginas del calendario (una página = un mes/semana).
+  // Lo usamos para cambiar de página con un gesto propio, más sensible que
+  // el arrastre interno de table_calendar.
+  PageController? _calendarPage;
+
+  /// Avanza (+1) o retrocede (-1) una página del calendario con animación.
+  void _changePage(int delta) {
+    final controller = _calendarPage;
+    if (controller == null || !controller.hasClients) return;
+    final current = (controller.page ?? controller.initialPage.toDouble());
+    final target = (current.round() + delta).clamp(0, 1 << 30);
+    controller.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final selectedDay = ref.watch(selectedDayProvider);
-    final focusedMonth = ref.watch(focusedMonthProvider);
+    final focusedDay = ref.watch(focusedDayProvider);
     final eventsByDay = ref.watch(eventsByDayProvider);
     final dayEvents =
         ref.watch(selectedDayEventsProvider).value ?? const <Event>[];
@@ -43,13 +66,32 @@ class CalendarScreen extends ConsumerWidget {
           bottom: false,
           child: Column(
             children: [
-              TableCalendar<Event>(
-                locale: 'es',
-                firstDay: DateTime(2020),
-                lastDay: DateTime(2035, 12, 31),
-                focusedDay: focusedMonth,
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                calendarFormat: ref.watch(calendarFormatProvider),
+              GestureDetector(
+                // Detector propio: cualquier deslizamiento horizontal cambia de
+                // página (mes). Es mucho más sensible que el arrastre interno
+                // del PageView, que exige un impulso fuerte y obligaba a
+                // deslizar varias veces. El toque en un día sigue funcionando
+                // porque el tap gana la disputa frente al arrastre.
+                onHorizontalDragEnd: (details) {
+                  final velocity = details.primaryVelocity ?? 0;
+                  if (velocity < -60) {
+                    _changePage(1); // deslizar a la izquierda → mes siguiente
+                  } else if (velocity > 60) {
+                    _changePage(-1); // deslizar a la derecha → mes anterior
+                  }
+                },
+                child: TableCalendar<Event>(
+                  locale: 'es',
+                  firstDay: DateTime(2020),
+                  lastDay: DateTime(2035, 12, 31),
+                  focusedDay: focusedDay,
+                  startingDayOfWeek: StartingDayOfWeek.sunday,
+                  // Desactivamos el arrastre interno; la navegación la maneja el
+                  // GestureDetector de arriba mediante el PageController.
+                  availableGestures: AvailableGestures.none,
+                  onCalendarCreated: (controller) =>
+                      _calendarPage = controller,
+                  calendarFormat: ref.watch(calendarFormatProvider),
                 onFormatChanged: (format) =>
                     ref.read(calendarFormatProvider.notifier).set(format),
                 availableCalendarFormats: const {
@@ -60,10 +102,10 @@ class CalendarScreen extends ConsumerWidget {
                 selectedDayPredicate: (day) => isSameDay(day, selectedDay),
                 onDaySelected: (selected, focused) {
                   ref.read(selectedDayProvider.notifier).select(selected);
-                  ref.read(focusedMonthProvider.notifier).focus(focused);
+                  ref.read(focusedDayProvider.notifier).focus(focused);
                 },
                 onPageChanged: (focused) =>
-                    ref.read(focusedMonthProvider.notifier).focus(focused),
+                    ref.read(focusedDayProvider.notifier).focus(focused),
                 eventLoader: (day) => eventsByDay[dayKey(day)] ?? const [],
                 headerStyle: HeaderStyle(
                   formatButtonVisible: true,
@@ -134,6 +176,7 @@ class CalendarScreen extends ConsumerWidget {
                       ),
                     );
                   },
+                ),
                 ),
               ),
               const _PetPeek(),
@@ -248,7 +291,7 @@ class _EventCard extends StatelessWidget {
     final titleColor = HSLColor.fromColor(categoryColor)
         .withLightness(isDark ? 0.8 : 0.3)
         .toColor();
-    final timeFormat = DateFormat.Hm();
+    final timeFormat = DateFormat('h:mm a');
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),

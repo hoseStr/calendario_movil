@@ -145,7 +145,7 @@ class _EventDetailView extends ConsumerWidget {
 
   String _formatRange(DateTime start, DateTime end) {
     final dayFormat = DateFormat("EEEE d 'de' MMMM", 'es');
-    final timeFormat = DateFormat.Hm();
+    final timeFormat = DateFormat('h:mm a');
     final sameDay = start.year == end.year &&
         start.month == end.month &&
         start.day == end.day;

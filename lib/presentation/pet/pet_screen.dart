@@ -13,24 +13,11 @@ import 'pet_providers.dart';
 
 /// Pantalla de la mascota: mensaje vigente + historial.
 /// La imagen estática se reemplaza por animaciones en la Fase 8.
-class PetScreen extends ConsumerStatefulWidget {
+class PetScreen extends ConsumerWidget {
   const PetScreen({super.key});
 
   @override
-  ConsumerState<PetScreen> createState() => _PetScreenState();
-}
-
-class _PetScreenState extends ConsumerState<PetScreen> {
-  bool _generating = false;
-
-  Future<void> _refresh() async {
-    setState(() => _generating = true);
-    await ref.read(petMessageServiceProvider).ensureFreshMessage(force: true);
-    if (mounted) setState(() => _generating = false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final latest = ref.watch(latestPetMessageProvider).value;
     final history = ref.watch(petHistoryProvider).value ?? const [];
     final textTheme = Theme.of(context).textTheme;
@@ -42,19 +29,6 @@ class _PetScreenState extends ConsumerState<PetScreen> {
         title: Text(ref.watch(petPrefsProvider).name.isEmpty
             ? 'Mascota'
             : ref.watch(petPrefsProvider).name),
-        actions: [
-          IconButton(
-            tooltip: 'Nuevo mensaje',
-            onPressed: _generating ? null : _refresh,
-            icon: _generating
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.auto_awesome_outlined),
-          ),
-        ],
       ),
       body: DreamyBackground(
         child: SafeArea(

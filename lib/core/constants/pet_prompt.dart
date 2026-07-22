@@ -71,7 +71,7 @@ Reglas estrictas:
           '; próximos 7 días: ${summary.weekCount}; próximos 30 días: ${summary.monthCount}.')
       ..writeln(nextEventStart == null
           ? 'No quedan más eventos hoy.'
-          : 'Próximo evento hoy a las ${DateFormat.Hm().format(nextEventStart)}.');
+          : 'Próximo evento hoy a las ${DateFormat('h:mm a').format(nextEventStart)}.');
     if (recentMessages.isNotEmpty) {
       buffer.writeln('Tus mensajes recientes (NO los repitas):');
       for (final m in recentMessages) {

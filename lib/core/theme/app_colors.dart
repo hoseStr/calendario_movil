@@ -13,6 +13,8 @@ abstract final class AppColors {
   static const Color nightDark = Color(0xFF17132A); // noche violeta
 
   // Colores de categorías de eventos (pasteles oníricos, Fase 4).
+  // Tonos repartidos por el círculo cromático para diferenciarse bien
+  // manteniendo la estética brumosa de la app.
   static const List<Color> eventCategories = [
     Color(0xFFA99BE0), // lavanda — general
     Color(0xFF8FD8CE), // menta bruma — trabajo/estudio
@@ -20,5 +22,9 @@ abstract final class AppColors {
     Color(0xFFF4B8A0), // durazno — importante
     Color(0xFF9EC9F0), // azul cielo — salud
     Color(0xFFE8C9F0), // lila pálido — ocio
+    Color(0xFFF0DA9A), // mantequilla — amarillo suave
+    Color(0xFFB4D9A0), // verde salvia — naturaleza
+    Color(0xFFF29B9B), // coral bruma — urgente
+    Color(0xFF9DA8EA), // periwinkle — azul violáceo
   ];
 }

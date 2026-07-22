@@ -123,5 +123,5 @@ class ReminderScheduler {
       );
 
   String _body(DateTime startAt) =>
-      'Empieza a las ${DateFormat.Hm().format(startAt)}';
+      'Empieza a las ${DateFormat('h:mm a').format(startAt)}';
 }

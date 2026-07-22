@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
+import '../../core/utils/time_picker.dart';
 import '../app_providers.dart';
 import '../pet/pet_providers.dart';
 import 'settings_providers.dart';
@@ -55,7 +56,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _pickMorningTime() async {
     final prefs = ref.read(petPrefsProvider);
-    final picked = await showTimePicker(
+    final picked = await showAmPmTimePicker(
       context: context,
       initialTime: TimeOfDay(
         hour: prefs.morningMinutes ~/ 60,
@@ -220,9 +221,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _syncControllers(prefs);
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
-    final morningLabel =
-        '${(prefs.morningMinutes ~/ 60).toString().padLeft(2, '0')}:'
-        '${(prefs.morningMinutes % 60).toString().padLeft(2, '0')}';
+    final morningLabel = DateFormat('h:mm a').format(
+      DateTime(2000, 1, 1, prefs.morningMinutes ~/ 60,
+          prefs.morningMinutes % 60),
+    );
 
     return Scaffold(
       extendBodyBehindAppBar: true,

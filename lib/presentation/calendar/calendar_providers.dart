@@ -31,19 +31,19 @@ class SelectedDayNotifier extends Notifier<DateTime> {
 final selectedDayProvider =
     NotifierProvider<SelectedDayNotifier, DateTime>(SelectedDayNotifier.new);
 
-/// Primer día del mes visible (cambia al deslizar páginas).
-class FocusedMonthNotifier extends Notifier<DateTime> {
+/// Día en foco del calendario: define la página (mes) y la semana visible.
+/// Se guarda el día real (normalizado a medianoche), NO el primero del mes,
+/// para que las vistas de semana / 2 semanas se alineen correctamente y el
+/// día actual / seleccionado quede dentro de la ventana visible.
+class FocusedDayNotifier extends Notifier<DateTime> {
   @override
-  DateTime build() {
-    final now = DateTime.now();
-    return DateTime(now.year, now.month);
-  }
+  DateTime build() => dayKey(DateTime.now());
 
-  void focus(DateTime day) => state = DateTime(day.year, day.month);
+  void focus(DateTime day) => state = dayKey(day);
 }
 
-final focusedMonthProvider =
-    NotifierProvider<FocusedMonthNotifier, DateTime>(FocusedMonthNotifier.new);
+final focusedDayProvider =
+    NotifierProvider<FocusedDayNotifier, DateTime>(FocusedDayNotifier.new);
 
 /// Formato del calendario (mes / 2 semanas / semana).
 class CalendarFormatNotifier extends Notifier<CalendarFormat> {
@@ -60,7 +60,11 @@ final calendarFormatProvider =
 /// Stream reactivo de eventos del mes visible (± 1 semana para cubrir
 /// los días de meses vecinos que se ven en la cuadrícula).
 final monthEventsProvider = StreamProvider<List<Event>>((ref) {
-  final month = ref.watch(focusedMonthProvider);
+  // Solo depende del mes: seleccionar un día o mover el foco dentro del mismo
+  // mes no recrea la suscripción a la BD (evita jank al deslizar el calendario).
+  final month = ref.watch(
+    focusedDayProvider.select((d) => DateTime(d.year, d.month)),
+  );
   final from = month.subtract(const Duration(days: 7));
   final to =
       DateTime(month.year, month.month + 1, 1).add(const Duration(days: 7));

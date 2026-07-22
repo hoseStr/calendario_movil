@@ -100,18 +100,20 @@ class _FireflyPainter extends CustomPainter {
     Color(0xFFA99BE0),
     Color(0xFFF2A6C8),
   ];
+  // Tema claro: solo morados y rosados, algo más saturados para que se noten
+  // sobre el fondo pálido sin dejar de sentirse al fondo.
   static const _lightColors = [
-    Color(0xFFA99BE0),
-    Color(0xFF8E7CC3),
-    Color(0xFFF2A6C8),
-    Color(0xFF9EC9F0),
+    Color(0xFF7A5FC0), // violeta
+    Color(0xFFB56CE0), // lila fuerte
+    Color(0xFFE86AA8), // rosa fuerte
+    Color(0xFFD86FD0), // magenta rosado
   ];
 
   @override
   void paint(Canvas canvas, Size size) {
     final t = animation.value;
     final colors = isDark ? _darkColors : _lightColors;
-    final maxAlpha = isDark ? 0.55 : 0.32;
+    final maxAlpha = isDark ? 0.55 : 0.40;
 
     for (final fly in flies) {
       // Posición: deriva + vaivén lateral suave; envuelve los bordes.

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/responsive/responsive.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/time_picker.dart';
 import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
@@ -108,7 +109,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
       lastDate: DateTime(2035, 12, 31),
     );
     if (date == null || !mounted) return;
-    final time = await showTimePicker(
+    final time = await showAmPmTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(initial),
     );
@@ -221,18 +222,35 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                       const SizedBox(height: 20),
                       Text('Color', style: textTheme.titleMedium),
                       const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 12,
-                        children: [
-                          for (var i = 0;
-                              i < AppColors.eventCategories.length;
-                              i++)
-                            _ColorDot(
-                              color: AppColors.eventCategories[i],
-                              selected: i == _colorIndex,
-                              onTap: () => setState(() => _colorIndex = i),
-                            ),
-                        ],
+                      // Fila horizontal desplazable: se arrastra de lado a lado
+                      // para elegir el color sin que las etiquetas se apiñen.
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        // Padding vertical para que el borde del seleccionado
+                        // no quede recortado.
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            for (var i = 0;
+                                i < AppColors.eventCategories.length;
+                                i++)
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  right: i ==
+                                          AppColors.eventCategories.length - 1
+                                      ? 0
+                                      : 14,
+                                ),
+                                child: _ColorDot(
+                                  color: AppColors.eventCategories[i],
+                                  selected: i == _colorIndex,
+                                  onTap: () =>
+                                      setState(() => _colorIndex = i),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 20),
                       DropdownButtonFormField<String?>(
