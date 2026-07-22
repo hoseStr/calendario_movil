@@ -7,6 +7,7 @@ import '../../data/services/llm_client.dart';
 import '../../data/services/pet_message_service.dart';
 import '../../domain/entities/pet_message.dart';
 import '../calendar/calendar_providers.dart';
+import '../settings/settings_providers.dart';
 
 final petMessageRepositoryProvider = Provider<PetMessageRepository>(
   (ref) => PetMessageRepository(ref.watch(databaseProvider)),
@@ -23,6 +24,7 @@ final petMessageServiceProvider = Provider<PetMessageService>(
     // Clave embebida al compilar (secrets.json + --dart-define-from-file).
     () async =>
         BuildConfig.hasEmbeddedKey ? BuildConfig.embeddedGeminiKey : null,
+    ref.watch(settingsRepositoryProvider),
   ),
 );
 

@@ -37,6 +37,21 @@ Reglas estrictas:
 - El lenguaje de internet y las caritas deben sonar tiernos, no forzados: mejor poquito y bien puesto que saturado.
 ''';
 
+  /// Prompt de sistema con los ajustes del usuario añadidos al final
+  /// (no modifica el texto base de arriba).
+  static String systemWith({String? name, String? personality}) {
+    final buffer = StringBuffer(system);
+    if (name != null && name.trim().isNotEmpty) {
+      buffer.writeln(
+          '\nTu nombre es "${name.trim()}". Puedes mencionarlo con cariño de vez en cuando, sin repetirlo en cada mensaje.');
+    }
+    if (personality != null && personality.trim().isNotEmpty) {
+      buffer.writeln(
+          'Rasgos extra que te definió tu humano (intégralos con naturalidad, sin contradecir lo anterior): ${personality.trim()}');
+    }
+    return buffer.toString();
+  }
+
   static String user({
     required AgendaSummary summary,
     required List<String> todayTitles,

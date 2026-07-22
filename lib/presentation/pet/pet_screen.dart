@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/agenda_summary.dart';
 import '../../domain/entities/pet_message.dart';
+import '../settings/settings_providers.dart';
 import '../widgets/dreamy_pet.dart';
 import 'pet_providers.dart';
 
@@ -36,7 +37,9 @@ class _PetScreenState extends ConsumerState<PetScreen> {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
-        title: const Text('Mascota'),
+        title: Text(ref.watch(petPrefsProvider).name.isEmpty
+            ? 'Mascota'
+            : ref.watch(petPrefsProvider).name),
         actions: [
           IconButton(
             tooltip: 'Nuevo mensaje',

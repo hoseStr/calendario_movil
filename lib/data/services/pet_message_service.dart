@@ -5,6 +5,7 @@ import '../../domain/entities/pet_message.dart';
 import '../../domain/usecases/summarize_agenda.dart';
 import '../repositories/event_repository.dart';
 import '../repositories/pet_message_repository.dart';
+import '../repositories/settings_repository.dart';
 import 'llm_client.dart';
 
 /// Genera el mensaje de la mascota: Gemini si hay clave e internet,
@@ -15,12 +16,14 @@ class PetMessageService {
     this._messages,
     this._llm,
     this._readApiKey,
+    this._settings,
   );
 
   final EventRepository _events;
   final PetMessageRepository _messages;
   final LlmClient _llm;
   final Future<String?> Function() _readApiKey;
+  final SettingsRepository _settings;
 
   /// Tope de generaciones por día POR DISPOSITIVO (protege la cuota
   /// gratuita de ~1.000 peticiones diarias de la clave compartida).
@@ -68,7 +71,10 @@ class PetMessageService {
     if (apiKey != null && apiKey.trim().isNotEmpty) {
       final generated = await _llm.generate(
         apiKey: apiKey.trim(),
-        system: PetPrompt.system,
+        system: PetPrompt.systemWith(
+          name: await _settings.get('pet_name'),
+          personality: await _settings.get('pet_personality'),
+        ),
         user: PetPrompt.user(
           summary: summary,
           todayTitles: todayEvents.map((e) => e.title).toList(),

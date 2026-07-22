@@ -32,13 +32,18 @@ Future<void> main() async {
 }
 
 /// La mascota piensa un mensaje nuevo en cada apertura (con tope diario)
-/// y deja programado el mensajito de mañana a las 8:00.
+/// y deja programado el mensajito de mañana a la hora configurada.
 Future<void> _bootstrapPet(ProviderContainer container) async {
   final message =
       await container.read(petMessageServiceProvider).ensureFreshMessage();
 
+  final saved =
+      await container.read(settingsRepositoryProvider).get('morning_minutes');
+  final minutes = int.tryParse(saved ?? '') ?? 480;
+
   final now = DateTime.now();
-  var nextMorning = DateTime(now.year, now.month, now.day, 8);
+  var nextMorning =
+      DateTime(now.year, now.month, now.day, minutes ~/ 60, minutes % 60);
   if (!nextMorning.isAfter(now)) {
     nextMorning = nextMorning.add(const Duration(days: 1));
   }

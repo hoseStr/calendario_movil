@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:calendario_movil/data/db/database.dart';
 import 'package:calendario_movil/data/repositories/event_repository.dart';
 import 'package:calendario_movil/data/repositories/pet_message_repository.dart';
+import 'package:calendario_movil/data/repositories/settings_repository.dart';
 import 'package:calendario_movil/data/services/llm_client.dart';
 import 'package:calendario_movil/data/services/pet_message_service.dart';
 
@@ -54,6 +55,7 @@ void main() {
         messages,
         llm,
         () async => apiKey,
+        SettingsRepository(db),
       );
 
   test('sin API key usa el banco local y no llama al LLM', () async {
