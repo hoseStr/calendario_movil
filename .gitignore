@@ -43,3 +43,30 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ============================================================
+# SEGURIDAD - NUNCA subir a git
+# ============================================================
+
+# API keys embebidas en compilacion
+secrets.json
+secrets.*.json
+
+# Variables de entorno
+.env
+.env.*
+*.env
+
+# Firma de la app Android (Fase 9: release firmado)
+*.jks
+*.keystore
+android/key.properties
+android/app/upload-keystore.jks
+
+# Configuracion local con rutas/SDKs de esta maquina
+android/local.properties
+
+# Credenciales de servicios (por si algun dia se usan)
+**/google-services.json
+**/GoogleService-Info.plist
+service-account*.json

@@ -5,11 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:calendario_movil/data/db/database.dart';
-import 'package:calendario_movil/domain/entities/agenda_summary.dart';
-import 'package:calendario_movil/domain/entities/pet_message.dart';
 import 'package:calendario_movil/main.dart';
 import 'package:calendario_movil/presentation/calendar/calendar_providers.dart';
-import 'package:calendario_movil/presentation/pet/pet_providers.dart';
 
 void main() {
   setUpAll(() async {
@@ -21,22 +18,12 @@ void main() {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(db.close);
 
+    // La UI de la mascota es reactiva (stream de la BD, vacía aquí);
+    // la generación solo ocurre en main() o con el botón de refresco,
+    // así que el test no dispara ninguna cadena asíncrona externa.
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(db),
-          // Mensaje fijo: la cadena asíncrona real (resumen de agenda +
-          // guardado en BD) no se lleva bien con el reloj falso del test
-          // y ya está cubierta por los tests unitarios.
-          dailyPetMessageProvider.overrideWith(
-            (ref) async => PetMessage(
-              date: DateTime(2026, 7, 22),
-              mood: PetMood.happy,
-              message: 'Hola humano',
-              source: 'fallback',
-            ),
-          ),
-        ],
+        overrides: [databaseProvider.overrideWithValue(db)],
         child: const CalendarioApp(),
       ),
     );

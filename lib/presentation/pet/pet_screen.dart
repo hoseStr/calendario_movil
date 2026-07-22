@@ -7,14 +7,27 @@ import '../../domain/entities/agenda_summary.dart';
 import '../../domain/entities/pet_message.dart';
 import 'pet_providers.dart';
 
-/// Pantalla de la mascota: mensaje del día + historial.
+/// Pantalla de la mascota: mensaje vigente + historial.
 /// La imagen estática se reemplaza por animaciones en la Fase 8.
-class PetScreen extends ConsumerWidget {
+class PetScreen extends ConsumerStatefulWidget {
   const PetScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final dailyMessage = ref.watch(dailyPetMessageProvider);
+  ConsumerState<PetScreen> createState() => _PetScreenState();
+}
+
+class _PetScreenState extends ConsumerState<PetScreen> {
+  bool _generating = false;
+
+  Future<void> _refresh() async {
+    setState(() => _generating = true);
+    await ref.read(petMessageServiceProvider).ensureFreshMessage(force: true);
+    if (mounted) setState(() => _generating = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final latest = ref.watch(latestPetMessageProvider).value;
     final history = ref.watch(petHistoryProvider).value ?? const [];
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
@@ -22,7 +35,22 @@ class PetScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
-      appBar: AppBar(title: const Text('Mascota')),
+      appBar: AppBar(
+        title: const Text('Mascota'),
+        actions: [
+          IconButton(
+            tooltip: 'Nuevo mensaje',
+            onPressed: _generating ? null : _refresh,
+            icon: _generating
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.auto_awesome_outlined),
+          ),
+        ],
+      ),
       body: DreamyBackground(
         child: SafeArea(
           bottom: false,
@@ -42,41 +70,23 @@ class PetScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Center(
-                child: dailyMessage.when(
-                  data: (msg) => _MoodChip(mood: msg.mood),
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, _) => const SizedBox.shrink(),
-                ),
-              ),
+              if (latest != null)
+                Center(child: _MoodChip(mood: latest.mood)),
               const SizedBox(height: 16),
-              dailyMessage.when(
-                data: (msg) => Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text(
-                      msg.message,
-                      textAlign: TextAlign.center,
-                      style: textTheme.titleMedium,
-                    ),
-                  ),
-                ),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (_, _) => Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text(
-                      'Hoy amanecí sin palabras… vuelve en un ratito.',
-                      textAlign: TextAlign.center,
-                      style: textTheme.titleMedium,
-                    ),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    latest?.message ??
+                        'Dame un segundo, estoy pensando qué decirte…',
+                    textAlign: TextAlign.center,
+                    style: textTheme.titleMedium,
                   ),
                 ),
               ),
               if (history.length > 1) ...[
                 const SizedBox(height: 28),
-                Text('Días anteriores', style: textTheme.titleMedium),
+                Text('Mensajes anteriores', style: textTheme.titleMedium),
                 const SizedBox(height: 12),
                 for (final msg in history.skip(1))
                   _HistoryTile(message: msg),
@@ -123,7 +133,7 @@ class _HistoryTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     final dateLabel =
-        DateFormat("EEE d 'de' MMM", 'es').format(message.date);
+        DateFormat("EEE d 'de' MMM · HH:mm", 'es').format(message.date);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),

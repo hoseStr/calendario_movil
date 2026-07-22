@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_gradients.dart';
 import 'settings_providers.dart';
 
-/// Ajustes de la app. Más secciones llegan en Fases 7 y 9
-/// (API key, mascota, hora del mensaje, backup…).
+/// Ajustes de la app. Más secciones llegan en Fase 9
+/// (nombre de la mascota, hora del mensaje, backup…).
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 

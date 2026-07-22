@@ -5,7 +5,11 @@ import '../entities/agenda_summary.dart';
 class SummarizeAgenda {
   const SummarizeAgenda();
 
-  AgendaSummary call({required int todayCount, required int weekCount}) {
+  AgendaSummary call({
+    required int todayCount,
+    required int weekCount,
+    int monthCount = 0,
+  }) {
     final load = switch (todayCount) {
       0 => DayLoad.free,
       1 || 2 => DayLoad.normal,
@@ -22,6 +26,7 @@ class SummarizeAgenda {
     return AgendaSummary(
       todayCount: todayCount,
       weekCount: weekCount,
+      monthCount: monthCount,
       load: load,
       mood: mood,
     );

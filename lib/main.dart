@@ -8,6 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/app_providers.dart';
+import 'presentation/pet/pet_providers.dart';
 import 'presentation/settings/settings_providers.dart';
 
 Future<void> main() async {
@@ -27,6 +28,10 @@ Future<void> main() async {
   // seguridad post-reinicio / tope iOS) y navegación si la app fue
   // abierta tocando una notificación.
   unawaited(_bootstrapReminders(container));
+
+  // La mascota piensa un mensaje nuevo en cada apertura
+  // (con gate interno de 30 min para cuidar la cuota gratuita).
+  unawaited(container.read(petMessageServiceProvider).ensureFreshMessage());
 }
 
 Future<void> _bootstrapReminders(ProviderContainer container) async {

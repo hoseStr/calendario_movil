@@ -27,17 +27,25 @@ void main() {
         source: 'fallback',
       );
 
-  test('getForDay devuelve null si no hay mensaje', () async {
-    expect(await repo.getForDay(DateTime(2026, 7, 21)), isNull);
+  test('latest devuelve null sin mensajes', () async {
+    expect(await repo.latest(), isNull);
   });
 
-  test('save guarda y getForDay recupera (normalizando la hora)', () async {
-    await repo.save(build(DateTime(2026, 7, 21, 15, 30)));
+  test('latest devuelve el más reciente con su timestamp completo',
+      () async {
+    await repo.save(build(DateTime(2026, 7, 21, 9, 0), text: 'mañana'));
+    await repo.save(build(DateTime(2026, 7, 21, 18, 30), text: 'tarde'));
 
-    final found = await repo.getForDay(DateTime(2026, 7, 21, 8));
-    expect(found, isNotNull);
-    expect(found!.message, 'Hola humano');
-    expect(found.mood, PetMood.happy);
+    final latest = await repo.latest();
+    expect(latest!.message, 'tarde');
+    expect(latest.date, DateTime(2026, 7, 21, 18, 30));
+  });
+
+  test('recentTexts devuelve los últimos N textos', () async {
+    for (var i = 1; i <= 5; i++) {
+      await repo.save(build(DateTime(2026, 7, 21, i), text: 'm$i'));
+    }
+    expect(await repo.recentTexts(3), ['m5', 'm4', 'm3']);
   });
 
   test('watchHistory ordena del más nuevo al más viejo', () async {

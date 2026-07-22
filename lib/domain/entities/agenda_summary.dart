@@ -10,12 +10,16 @@ class AgendaSummary {
   const AgendaSummary({
     required this.todayCount,
     required this.weekCount,
+    this.monthCount = 0,
     required this.load,
     required this.mood,
   });
 
   final int todayCount;
   final int weekCount;
+
+  /// Eventos en los próximos 30 días.
+  final int monthCount;
   final DayLoad load;
   final PetMood mood;
 }
