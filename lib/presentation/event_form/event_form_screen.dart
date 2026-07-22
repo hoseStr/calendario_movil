@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
+import '../../domain/usecases/expand_recurrences.dart';
 import '../app_providers.dart';
 import '../calendar/calendar_providers.dart';
 
@@ -41,6 +42,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
   late DateTime _endAt;
   int _colorIndex = 0;
   int? _reminderMinutes;
+  String? _recurrenceRule;
   Event? _original;
   bool _loading = false;
   bool _saving = false;
@@ -82,6 +84,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
         _endAt = event.endAt;
         _colorIndex = event.colorIndex;
         _reminderMinutes = event.reminderMinutes;
+        _recurrenceRule = event.recurrenceRule;
       }
       _loading = false;
     });
@@ -142,7 +145,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
       endAt: _endAt,
       colorIndex: _colorIndex,
       category: _original?.category,
-      recurrenceRule: _original?.recurrenceRule,
+      recurrenceRule: _recurrenceRule,
       reminderMinutes: _reminderMinutes,
       createdAt: _original?.createdAt ?? now,
       updatedAt: now,
@@ -227,6 +230,21 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                               onTap: () => setState(() => _colorIndex = i),
                             ),
                         ],
+                      ),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String?>(
+                        initialValue: _recurrenceRule,
+                        decoration:
+                            const InputDecoration(labelText: 'Repetición'),
+                        items: [
+                          for (final entry in RecurrenceRules.labels.entries)
+                            DropdownMenuItem<String?>(
+                              value: entry.key,
+                              child: Text(entry.value),
+                            ),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _recurrenceRule = value),
                       ),
                       const SizedBox(height: 20),
                       DropdownButtonFormField<int?>(

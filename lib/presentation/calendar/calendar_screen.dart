@@ -27,7 +27,16 @@ class CalendarScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
-      appBar: AppBar(title: const Text('Calendario')),
+      appBar: AppBar(
+        title: const Text('Calendario'),
+        actions: [
+          IconButton(
+            tooltip: 'Buscar',
+            icon: const Icon(Icons.search),
+            onPressed: () => context.push('/search'),
+          ),
+        ],
+      ),
       body: DreamyBackground(
         child: SafeArea(
           bottom: false,
@@ -39,7 +48,14 @@ class CalendarScreen extends ConsumerWidget {
                 lastDay: DateTime(2035, 12, 31),
                 focusedDay: focusedMonth,
                 startingDayOfWeek: StartingDayOfWeek.monday,
-                availableCalendarFormats: const {CalendarFormat.month: 'Mes'},
+                calendarFormat: ref.watch(calendarFormatProvider),
+                onFormatChanged: (format) =>
+                    ref.read(calendarFormatProvider.notifier).set(format),
+                availableCalendarFormats: const {
+                  CalendarFormat.month: 'Mes',
+                  CalendarFormat.twoWeeks: '2 semanas',
+                  CalendarFormat.week: 'Semana',
+                },
                 selectedDayPredicate: (day) => isSameDay(day, selectedDay),
                 onDaySelected: (selected, focused) {
                   ref.read(selectedDayProvider.notifier).select(selected);
@@ -49,7 +65,18 @@ class CalendarScreen extends ConsumerWidget {
                     ref.read(focusedMonthProvider.notifier).focus(focused),
                 eventLoader: (day) => eventsByDay[dayKey(day)] ?? const [],
                 headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
+                  formatButtonVisible: true,
+                  formatButtonShowsNext: false,
+                  formatButtonDecoration: BoxDecoration(
+                    border: Border.all(
+                        color: scheme.primary.withValues(alpha: 0.5)),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  formatButtonTextStyle: TextStyle(
+                    color: scheme.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                   titleCentered: true,
                   titleTextStyle: textTheme.titleLarge ?? const TextStyle(),
                   leftChevronIcon:

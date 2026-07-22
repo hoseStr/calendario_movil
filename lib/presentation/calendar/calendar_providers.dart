@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../../data/db/database.dart';
 import '../../data/repositories/event_repository.dart';
@@ -43,6 +44,18 @@ class FocusedMonthNotifier extends Notifier<DateTime> {
 
 final focusedMonthProvider =
     NotifierProvider<FocusedMonthNotifier, DateTime>(FocusedMonthNotifier.new);
+
+/// Formato del calendario (mes / 2 semanas / semana).
+class CalendarFormatNotifier extends Notifier<CalendarFormat> {
+  @override
+  CalendarFormat build() => CalendarFormat.month;
+
+  void set(CalendarFormat format) => state = format;
+}
+
+final calendarFormatProvider =
+    NotifierProvider<CalendarFormatNotifier, CalendarFormat>(
+        CalendarFormatNotifier.new);
 
 /// Stream reactivo de eventos del mes visible (± 1 semana para cubrir
 /// los días de meses vecinos que se ven en la cuadrícula).

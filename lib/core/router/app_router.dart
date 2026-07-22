@@ -6,6 +6,7 @@ import '../../presentation/calendar/calendar_screen.dart';
 import '../../presentation/event_form/event_detail_screen.dart';
 import '../../presentation/event_form/event_form_screen.dart';
 import '../../presentation/pet/pet_screen.dart';
+import '../../presentation/search/search_screen.dart';
 import '../../presentation/settings/settings_screen.dart';
 
 /// Router de la app.
@@ -20,6 +21,11 @@ final GoRouter appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) =>
           AlarmScreen(eventId: state.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: '/search',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const SearchScreen(),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>

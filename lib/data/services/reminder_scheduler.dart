@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:intl/intl.dart';
 
 import '../../domain/entities/event.dart';
+import '../../domain/usecases/expand_recurrences.dart';
 import '../db/database.dart';
 import 'notification_service.dart';
 
@@ -18,20 +19,20 @@ class ReminderScheduler {
   static const int _maxPending = 50;
 
   /// Crear/editar evento: cancela lo anterior y programa lo nuevo.
+  /// Para recurrentes se programa SOLO la próxima ocurrencia; al abrir
+  /// la app (rescheduleAll) se renueva la siguiente.
   Future<void> syncEvent(Event event) async {
     final id = event.id;
     if (id == null) return;
     await cancelForEvent(id);
 
-    final minutes = event.reminderMinutes;
-    if (minutes == null) return;
-    final fireAt = event.startAt.subtract(Duration(minutes: minutes));
-    if (!fireAt.isAfter(DateTime.now())) return;
+    final fireAt = _nextFireAt(event);
+    if (fireAt == null) return;
 
     await _notifications.schedule(
       id: id,
       title: event.title,
-      body: _body(event.startAt),
+      body: _body(fireAt.add(Duration(minutes: event.reminderMinutes!))),
       fireAt: fireAt,
       payload: '$id',
     );
@@ -44,6 +45,21 @@ class ReminderScheduler {
         );
   }
 
+  /// Próximo disparo del recordatorio (ocurrencia siguiente si es
+  /// recurrente), o null si no aplica.
+  DateTime? _nextFireAt(Event event) {
+    final minutes = event.reminderMinutes;
+    if (minutes == null) return null;
+    final now = DateTime.now();
+    // La ocurrencia debe empezar después de now + antelación para que
+    // el disparo (inicio - antelación) quede en el futuro.
+    final start = const ExpandRecurrences()
+        .nextOccurrenceStart(event, now.add(Duration(minutes: minutes)));
+    if (start == null) return null;
+    final fireAt = start.subtract(Duration(minutes: minutes));
+    return fireAt.isAfter(now) ? fireAt : null;
+  }
+
   /// Borrar evento: cancela su notificación y limpia la bitácora.
   Future<void> cancelForEvent(int eventId) async {
     await _notifications.cancel(eventId);
@@ -53,8 +69,8 @@ class ReminderScheduler {
   }
 
   /// Red de seguridad al abrir la app: reprograma los próximos
-  /// recordatorios. Cubre reinicios del dispositivo, actualizaciones de
-  /// la app y el tope de pendientes de iOS.
+  /// recordatorios (incluida la siguiente ocurrencia de cada serie
+  /// recurrente). Cubre reinicios, actualizaciones y el tope de iOS.
   Future<void> rescheduleAll() async {
     final now = DateTime.now();
     await _db.delete(_db.reminders).go();
@@ -62,21 +78,23 @@ class ReminderScheduler {
     final rows = await (_db.select(_db.events)
           ..where((t) =>
               t.reminderMinutes.isNotNull() &
-              t.startAt.isBiggerThanValue(now))
-          ..orderBy([(t) => OrderingTerm.asc(t.startAt)]))
+              (t.startAt.isBiggerThanValue(now) |
+                  t.recurrenceRule.isNotNull())))
         .get();
 
-    var scheduled = 0;
+    // Calcula el próximo disparo de cada evento y ordena por cercanía.
+    final candidates = <(DateTime, EventRow)>[];
     for (final row in rows) {
-      if (scheduled >= _maxPending) break;
-      final fireAt =
-          row.startAt.subtract(Duration(minutes: row.reminderMinutes!));
-      if (!fireAt.isAfter(now)) continue;
+      final fireAt = _nextFireAt(_toEntity(row));
+      if (fireAt != null) candidates.add((fireAt, row));
+    }
+    candidates.sort((a, b) => a.$1.compareTo(b.$1));
 
+    for (final (fireAt, row) in candidates.take(_maxPending)) {
       await _notifications.schedule(
         id: row.id,
         title: row.title,
-        body: _body(row.startAt),
+        body: _body(fireAt.add(Duration(minutes: row.reminderMinutes!))),
         fireAt: fireAt,
         payload: '${row.id}',
       );
@@ -87,9 +105,22 @@ class ReminderScheduler {
               notificationId: row.id,
             ),
           );
-      scheduled++;
     }
   }
+
+  Event _toEntity(EventRow row) => Event(
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        startAt: row.startAt,
+        endAt: row.endAt,
+        colorIndex: row.colorIndex,
+        category: row.category,
+        recurrenceRule: row.recurrenceRule,
+        reminderMinutes: row.reminderMinutes,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+      );
 
   String _body(DateTime startAt) =>
       'Empieza a las ${DateFormat.Hm().format(startAt)}';

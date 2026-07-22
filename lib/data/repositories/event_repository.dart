@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/entities/event.dart';
+import '../../domain/usecases/expand_recurrences.dart';
 import '../db/database.dart';
 
 /// Acceso a eventos. La UI nunca toca drift directamente:
@@ -10,17 +11,38 @@ class EventRepository {
 
   final AppDatabase _db;
 
-  /// Stream reactivo de los eventos que se solapan con [from, to).
+  /// Stream reactivo de los eventos que se solapan con [from, to),
+  /// con los recurrentes ya expandidos en sus ocurrencias del rango.
   /// Se emite de nuevo automáticamente ante cualquier cambio.
   Stream<List<Event>> watchEventsBetween(DateTime from, DateTime to) {
     final query = _db.select(_db.events)
       ..where((t) =>
-          t.startAt.isSmallerThanValue(to) &
-          t.endAt.isBiggerOrEqualValue(from))
-      ..orderBy([(t) => OrderingTerm.asc(t.startAt)]);
+          (t.recurrenceRule.isNull() &
+              t.startAt.isSmallerThanValue(to) &
+              t.endAt.isBiggerOrEqualValue(from)) |
+          // Recurrentes: basta con que la serie empiece antes del fin
+          // del rango; la expansión decide qué ocurrencias caen dentro.
+          (t.recurrenceRule.isNotNull() & t.startAt.isSmallerThanValue(to)));
     return query.watch().map(
-          (rows) => rows.map(_toEntity).toList(),
+          (rows) => const ExpandRecurrences()(
+            rows.map(_toEntity).toList(),
+            from,
+            to,
+          ),
         );
+  }
+
+  /// Búsqueda por texto en título y descripción (más recientes primero).
+  Future<List<Event>> search(String text) async {
+    final pattern = '%${text.trim()}%';
+    final rows = await (_db.select(_db.events)
+          ..where((t) =>
+              t.title.like(pattern) |
+              t.description.like(pattern))
+          ..orderBy([(t) => OrderingTerm.desc(t.startAt)])
+          ..limit(100))
+        .get();
+    return rows.map(_toEntity).toList();
   }
 
   /// Inserta y devuelve la entidad con su id asignado.

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
+import '../../domain/usecases/expand_recurrences.dart';
 import '../app_providers.dart';
 import '../calendar/calendar_providers.dart';
 import 'event_providers.dart';
@@ -103,6 +104,14 @@ class _EventDetailView extends ConsumerWidget {
                 icon: Icons.schedule,
                 text: _formatRange(event.startAt, event.endAt),
               ),
+              if (event.recurrenceRule != null) ...[
+                const SizedBox(height: 12),
+                _InfoRow(
+                  icon: Icons.repeat,
+                  text:
+                      'Se repite: ${RecurrenceRules.labels[event.recurrenceRule]?.toLowerCase() ?? event.recurrenceRule!}',
+                ),
+              ],
               const SizedBox(height: 12),
               _InfoRow(
                 icon: Icons.notifications_outlined,

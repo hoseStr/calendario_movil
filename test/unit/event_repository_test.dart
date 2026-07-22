@@ -125,6 +125,47 @@ void main() {
       expect(after, isNull);
     });
 
+    test('watchEventsBetween expande eventos recurrentes', () async {
+      final base = buildEvent(
+        title: 'Yoga diaria',
+        start: DateTime(2026, 6, 1, 7),
+      );
+      await repo.create(Event(
+        title: base.title,
+        startAt: base.startAt,
+        endAt: base.endAt,
+        recurrenceRule: 'daily',
+        createdAt: base.createdAt,
+        updatedAt: base.updatedAt,
+      ));
+
+      final events = await repo
+          .watchEventsBetween(DateTime(2026, 7, 10), DateTime(2026, 7, 13))
+          .first;
+
+      expect(events.length, 3);
+      expect(events.every((e) => e.title == 'Yoga diaria'), isTrue);
+      expect(events[0].startAt, DateTime(2026, 7, 10, 7));
+    });
+
+    test('search encuentra por título y descripción', () async {
+      await repo.create(buildEvent(title: 'Cita con el dentista'));
+      final withDesc = buildEvent(title: 'Reunión');
+      await repo.create(Event(
+        title: withDesc.title,
+        description: 'Llevar informe del dentista',
+        startAt: withDesc.startAt,
+        endAt: withDesc.endAt,
+        createdAt: withDesc.createdAt,
+        updatedAt: withDesc.updatedAt,
+      ));
+      await repo.create(buildEvent(title: 'Gimnasio'));
+
+      final results = await repo.search('dentista');
+
+      expect(results.length, 2);
+    });
+
     test('el stream emite de nuevo al insertar', () async {
       final stream = repo.watchEventsBetween(
         DateTime(2026, 7, 1),
