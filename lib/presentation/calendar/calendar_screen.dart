@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
 import '../pet/pet_providers.dart';
@@ -72,9 +73,11 @@ class CalendarScreen extends ConsumerWidget {
                         color: scheme.primary.withValues(alpha: 0.5)),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  formatButtonTextStyle: TextStyle(
+                  // Deriva de labelSmall para respetar el escalado de fuente.
+                  formatButtonTextStyle: (textTheme.labelSmall ??
+                          const TextStyle())
+                      .copyWith(
                     color: scheme.primary,
-                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                   titleCentered: true,
@@ -135,7 +138,8 @@ class CalendarScreen extends ConsumerWidget {
               ),
               const _PetPeek(),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                padding: const EdgeInsets.fromLTRB(
+                    Gap.xl, Gap.sm, Gap.xl, Gap.sm),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -155,7 +159,10 @@ class CalendarScreen extends ConsumerWidget {
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+                        // Clearance inferior para que el último evento no
+                        // quede tapado por el FAB.
+                        padding: const EdgeInsets.fromLTRB(Insets.screenH, 0,
+                            Insets.screenH, Insets.fabClearance),
                         itemCount: dayEvents.length,
                         itemBuilder: (context, index) =>
                             _EventCard(event: dayEvents[index]),

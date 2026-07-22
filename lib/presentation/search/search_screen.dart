@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
 import '../calendar/calendar_providers.dart';
@@ -83,7 +84,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                padding: const EdgeInsets.fromLTRB(
+                    Insets.screenH, Gap.sm, Insets.screenH, Gap.xs),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -134,8 +136,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             ),
                           )
                         : ListView.builder(
-                            padding:
-                                const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                            padding: const EdgeInsets.fromLTRB(
+                                Insets.screenH, Gap.xs, Insets.screenH, Gap.xxl),
                             itemCount: visible.length,
                             itemBuilder: (context, index) =>
                                 _ResultCard(event: visible[index]),

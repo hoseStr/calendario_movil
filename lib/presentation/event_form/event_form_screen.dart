@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/responsive/responsive.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
 import '../../domain/usecases/expand_recurrences.dart';
@@ -181,7 +183,8 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                 child: Form(
                   key: _formKey,
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                    padding: const EdgeInsets.fromLTRB(
+                        Gap.xl, Gap.sm, Gap.xl, Gap.xxxl),
                     children: [
                       TextFormField(
                         controller: _titleCtrl,
@@ -314,7 +317,15 @@ class _DateTile extends StatelessWidget {
                   Text(label,
                       style: Theme.of(context).textTheme.titleMedium),
                   const Spacer(),
-                  Text(value, style: Theme.of(context).textTheme.bodyMedium),
+                  Flexible(
+                    child: Text(
+                      value,
+                      textAlign: TextAlign.end,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -350,12 +361,13 @@ class _ColorDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final dot = context.scale(36, max: 1.2);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        width: 36,
-        height: 36,
+        width: dot,
+        height: dot,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
@@ -364,7 +376,7 @@ class _ColorDot extends StatelessWidget {
               : null,
         ),
         child: selected
-            ? const Icon(Icons.check, size: 18, color: Colors.black54)
+            ? Icon(Icons.check, size: dot * 0.5, color: Colors.black54)
             : null,
       ),
     );

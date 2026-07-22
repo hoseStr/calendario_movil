@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/fallback_messages.dart';
+import '../../core/responsive/responsive.dart';
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/agenda_summary.dart';
 import '../../domain/entities/event.dart';
@@ -48,62 +50,77 @@ class _AlarmContent extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     final petMessage = FallbackMessages.randomHurry();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-      child: Column(
-        children: [
-          const Spacer(flex: 2),
-          Text(
-            event.title,
-            textAlign: TextAlign.center,
-            style: textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _subtitle(event.startAt),
-            textAlign: TextAlign.center,
-            style: textTheme.titleMedium?.copyWith(
-              color: scheme.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
-          const Spacer(flex: 1),
-          // La mascota, apurándote con cariño.
-          const DreamyPet(mood: PetMood.hurrying, size: 130),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              child: Text(
-                petMessage,
-                textAlign: TextAlign.center,
-                style: textTheme.bodyMedium,
+    // Scroll-safe: centra el contenido cuando cabe, pero permite hacer
+    // scroll si la pantalla es corta o la fuente es grande (evita overflow).
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+              horizontal: Gap.xxxl, vertical: Gap.xxl),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                children: [
+                  const Spacer(flex: 2),
+                  Text(
+                    event.title,
+                    textAlign: TextAlign.center,
+                    style: textTheme.headlineMedium,
+                  ),
+                  Gaps.vMd,
+                  Text(
+                    _subtitle(event.startAt),
+                    textAlign: TextAlign.center,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const Spacer(flex: 1),
+                  // La mascota, apurándote con cariño.
+                  DreamyPet(
+                    mood: PetMood.hurrying,
+                    size: context.scaleCapped(120, 150),
+                  ),
+                  Gaps.vLg,
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: Gap.xl, vertical: Gap.md),
+                      child: Text(
+                        petMessage,
+                        textAlign: TextAlign.center,
+                        style: textTheme.bodyMedium,
+                      ),
+                    ),
+                  ),
+                  const Spacer(flex: 2),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(56),
+                    ),
+                    onPressed: () => _dismiss(context, ref),
+                    child: const Text('Descartar'),
+                  ),
+                  Gaps.vMd,
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(56),
+                    ),
+                    onPressed: () => _snooze(context, ref),
+                    child: const Text('Aplazar 5 min'),
+                  ),
+                  Gaps.vSm,
+                  TextButton(
+                    onPressed: () => context.go('/event/${event.id}'),
+                    child: const Text('Ver detalle'),
+                  ),
+                ],
               ),
             ),
           ),
-          const Spacer(flex: 2),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(56),
-            ),
-            onPressed: () => _dismiss(context, ref),
-            child: const Text('Descartar'),
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(56),
-            ),
-            onPressed: () => _snooze(context, ref),
-            child: const Text('Aplazar 5 min'),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: () => context.go('/event/${event.id}'),
-            child: const Text('Ver detalle'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

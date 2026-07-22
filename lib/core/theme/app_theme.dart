@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'app_dimens.dart';
 import 'app_typography.dart';
 
 /// Temas claro y oscuro (Material 3) con estética onírica:
@@ -21,6 +22,8 @@ abstract final class AppTheme {
       useMaterial3: true,
       colorScheme: scheme,
       brightness: brightness,
+      // Densifica controles según la plataforma/pantalla.
+      visualDensity: VisualDensity.adaptivePlatformDensity,
     );
 
     return base.copyWith(
@@ -46,7 +49,7 @@ abstract final class AppTheme {
         elevation: 0,
         color: scheme.surface.withValues(alpha: isDark ? 0.55 : 0.75),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(Radii.card),
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -54,26 +57,26 @@ abstract final class AppTheme {
         foregroundColor: scheme.onPrimary,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Radii.fab),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: scheme.surface.withValues(alpha: isDark ? 0.5 : 0.8),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(Radii.input),
           borderSide: BorderSide.none,
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(Radii.input),
         ),
       ),
       dialogTheme: base.dialogTheme.copyWith(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(Radii.dialog),
         ),
       ),
     );

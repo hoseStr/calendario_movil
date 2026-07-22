@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/responsive/responsive.dart';
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/agenda_summary.dart';
 import '../../domain/entities/pet_message.dart';
@@ -58,13 +60,16 @@ class _PetScreenState extends ConsumerState<PetScreen> {
         child: SafeArea(
           bottom: false,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+            padding: const EdgeInsets.fromLTRB(
+                Gap.xl, Gap.sm, Gap.xl, Insets.bottomGap),
             children: [
               const SizedBox(height: 8),
               Center(
                 child: DreamyPet(
                   mood: latest?.mood ?? PetMood.happy,
-                  size: 170,
+                  // Se adapta al ancho: ~45 % de la pantalla, con tope
+                  // para no dominar en equipos grandes.
+                  size: context.scaleCapped(160, 190),
                 ),
               ),
               const SizedBox(height: 12),

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../app_providers.dart';
 import '../pet/pet_providers.dart';
@@ -230,10 +231,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: DreamyBackground(
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+            padding: const EdgeInsets.fromLTRB(
+                Gap.xl, Gap.sm, Gap.xl, Insets.bottomGap),
             children: [
               Text('Apariencia', style: textTheme.titleMedium),
-              const SizedBox(height: 12),
+              Gaps.vMd,
               Card(
                 margin: EdgeInsets.zero,
                 child: Padding(
@@ -263,9 +265,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              Gaps.vXxl,
               Text('Mascota', style: textTheme.titleMedium),
-              const SizedBox(height: 12),
+              Gaps.vMd,
               Card(
                 margin: EdgeInsets.zero,
                 child: Padding(
@@ -279,7 +281,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           labelText: 'Nombre de tu mascota',
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      Gaps.vMd,
                       TextField(
                         controller: _personalityCtrl,
                         maxLines: 2,
@@ -288,7 +290,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           hintText: 'ej. le encanta el café y odia los lunes',
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      Gaps.vMd,
                       FilledButton(
                         onPressed: _savePetPrefs,
                         child: const Text('Guardar'),
@@ -307,9 +309,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              Gaps.vXxl,
               Text('Copia de seguridad', style: textTheme.titleMedium),
-              const SizedBox(height: 12),
+              Gaps.vMd,
               Card(
                 margin: EdgeInsets.zero,
                 child: Padding(
@@ -347,9 +349,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              Gaps.vXxl,
               Text('Alarmas fiables', style: textTheme.titleMedium),
-              const SizedBox(height: 12),
+              Gaps.vMd,
               Card(
                 margin: EdgeInsets.zero,
                 child: Padding(

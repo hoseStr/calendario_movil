@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimens.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/event.dart';
 import '../../domain/usecases/expand_recurrences.dart';
@@ -75,7 +76,8 @@ class _EventDetailView extends ConsumerWidget {
       body: DreamyBackground(
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+            padding: const EdgeInsets.fromLTRB(
+                Gap.xl, Gap.sm, Gap.xl, Gap.xxxl),
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

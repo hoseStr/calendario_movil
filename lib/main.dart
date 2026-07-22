@@ -98,6 +98,22 @@ class CalendarioApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      // Limita el escalado de fuente del sistema a un rango seguro:
+      // respeta accesibilidad pero evita que el texto desborde en
+      // dispositivos con fuente/pantalla grande (causa #1 de la
+      // inconsistencia entre marcas). Ver RESPONSIVE_PLAN.md, Fase 0.
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: mq.textScaler.clamp(
+              minScaleFactor: 0.9,
+              maxScaleFactor: 1.3,
+            ),
+          ),
+          child: child!,
+        );
+      },
       routerConfig: appRouter,
     );
   }
