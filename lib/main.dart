@@ -28,10 +28,24 @@ Future<void> main() async {
   // seguridad post-reinicio / tope iOS) y navegación si la app fue
   // abierta tocando una notificación.
   unawaited(_bootstrapReminders(container));
+  unawaited(_bootstrapPet(container));
+}
 
-  // La mascota piensa un mensaje nuevo en cada apertura
-  // (con gate interno de 30 min para cuidar la cuota gratuita).
-  unawaited(container.read(petMessageServiceProvider).ensureFreshMessage());
+/// La mascota piensa un mensaje nuevo en cada apertura (con tope diario)
+/// y deja programado el mensajito de mañana a las 8:00.
+Future<void> _bootstrapPet(ProviderContainer container) async {
+  final message =
+      await container.read(petMessageServiceProvider).ensureFreshMessage();
+
+  final now = DateTime.now();
+  var nextMorning = DateTime(now.year, now.month, now.day, 8);
+  if (!nextMorning.isAfter(now)) {
+    nextMorning = nextMorning.add(const Duration(days: 1));
+  }
+  await container.read(notificationServiceProvider).scheduleMorningMessage(
+        fireAt: nextMorning,
+        body: message.message,
+      );
 }
 
 Future<void> _bootstrapReminders(ProviderContainer container) async {
@@ -48,6 +62,11 @@ Future<void> _bootstrapReminders(ProviderContainer container) async {
 }
 
 void _openEventFromPayload(String? payload) {
+  if (payload == 'pet') {
+    // Mensaje matutino → pestaña de la mascota.
+    appRouter.go('/pet');
+    return;
+  }
   final id = int.tryParse(payload ?? '');
   if (id != null) {
     // La notificación es una alarma: abre la pantalla de alarma

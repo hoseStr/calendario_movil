@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants/fallback_messages.dart';
 import '../../core/theme/app_gradients.dart';
+import '../../domain/entities/agenda_summary.dart';
 import '../../domain/entities/event.dart';
 import '../app_providers.dart';
 import '../event_form/event_providers.dart';
+import '../widgets/dreamy_pet.dart';
 
 /// Pantalla de alarma a pantalla completa (se muestra sobre el bloqueo).
 /// Desde la Fase 6-8 la mascota animada vivirá aquí.
@@ -65,16 +67,8 @@ class _AlarmContent extends ConsumerWidget {
             ),
           ),
           const Spacer(flex: 1),
-          // La mascota (placeholder hasta la Fase 8).
-          Container(
-            width: 96,
-            height: 96,
-            decoration: BoxDecoration(
-              color: scheme.primaryContainer.withValues(alpha: 0.6),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.pets, size: 48, color: scheme.primary),
-          ),
+          // La mascota, apurándote con cariño.
+          const DreamyPet(mood: PetMood.hurrying, size: 130),
           const SizedBox(height: 16),
           Card(
             child: Padding(

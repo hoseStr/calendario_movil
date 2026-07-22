@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../domain/entities/agenda_summary.dart';
 import '../../domain/entities/pet_message.dart';
+import '../widgets/dreamy_pet.dart';
 import 'pet_providers.dart';
 
 /// Pantalla de la mascota: mensaje vigente + historial.
@@ -30,7 +31,6 @@ class _PetScreenState extends ConsumerState<PetScreen> {
     final latest = ref.watch(latestPetMessageProvider).value;
     final history = ref.watch(petHistoryProvider).value ?? const [];
     final textTheme = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -59,14 +59,9 @@ class _PetScreenState extends ConsumerState<PetScreen> {
             children: [
               const SizedBox(height: 8),
               Center(
-                child: Container(
-                  width: 140,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: scheme.primaryContainer.withValues(alpha: 0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.pets, size: 72, color: scheme.primary),
+                child: DreamyPet(
+                  mood: latest?.mood ?? PetMood.happy,
+                  size: 170,
                 ),
               ),
               const SizedBox(height: 12),

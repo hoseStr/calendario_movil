@@ -48,6 +48,28 @@ class NotificationService {
     ),
   );
 
+  /// Notificación matutina de la mascota (id fijo: reprogramar reemplaza).
+  static const int morningNotificationId = 900001;
+
+  static const AndroidNotificationChannel _petChannel =
+      AndroidNotificationChannel(
+    'pet_messages',
+    'Mensajes de la mascota',
+    description: 'El mensajito diario de tu mascota',
+    importance: Importance.defaultImportance,
+  );
+
+  static const NotificationDetails _morningDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      'pet_messages',
+      'Mensajes de la mascota',
+      channelDescription: 'El mensajito diario de tu mascota',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
+
   /// [onSelect] se dispara al tocar una notificación con la app abierta
   /// o en segundo plano. El payload es el id del evento.
   Future<void> init({
@@ -69,11 +91,35 @@ class NotificationService {
       onDidReceiveNotificationResponse: (response) =>
           onSelect(response.payload),
     );
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_channel);
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    await android?.createNotificationChannel(_channel);
+    await android?.createNotificationChannel(_petChannel);
     _initialized = true;
+  }
+
+  /// Programa (o reemplaza) el mensaje matutino de la mascota.
+  /// Se reprograma en cada apertura de la app, así el texto siempre es
+  /// el mensaje más reciente y la hora respeta la zona local.
+  Future<void> scheduleMorningMessage({
+    required DateTime fireAt,
+    required String body,
+  }) async {
+    if (!fireAt.isAfter(DateTime.now())) return;
+    try {
+      await _plugin.zonedSchedule(
+        id: morningNotificationId,
+        title: 'Tu mascota amaneció con algo que decirte',
+        body: body,
+        scheduledDate: tz.TZDateTime.from(fireAt, tz.local),
+        notificationDetails: _morningDetails,
+        // Inexacta a propósito: no es una alarma, ahorra batería.
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: 'pet',
+      );
+    } on PlatformException {
+      // Sin permisos: simplemente no habrá mensaje matutino.
+    }
   }
 
   /// Payload si la app fue ABIERTA desde una notificación (app cerrada).

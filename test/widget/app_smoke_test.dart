@@ -27,7 +27,11 @@ void main() {
         child: const CalendarioApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    // pumpAndSettle no sirve aquí: las luciérnagas y la mascota animan
+    // en bucle infinito y nunca "se asientan". Pumps fijos en su lugar.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('Calendario'), findsWidgets);
