@@ -9,7 +9,7 @@
     <!-- Alarma a pantalla completa sobre el bloqueo (estilo Google Calendar) -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
     <application
-        android:label="calendario_movil"
+        android:label="Wuola"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

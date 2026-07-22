@@ -1,0 +1,6 @@
+# Copia este archivo como android/key.properties y rellena tus datos.
+# key.properties está en .gitignore: NUNCA lo subas al repositorio.
+storePassword=TU_PASSWORD_DEL_KEYSTORE
+keyPassword=TU_PASSWORD_DE_LA_CLAVE
+keyAlias=wuola
+storeFile=C:\\Users\\JOSE\\Documents\\dev\\movlies-firmadas\\wuola-release.jks
